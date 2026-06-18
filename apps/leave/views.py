@@ -77,15 +77,26 @@ def send_leave_email(recipient_email, subject, leave_request):
     send_mail(subject, body, settings.DEFAULT_FROM_EMAIL, [recipient_email], fail_silently=False)
     
 def get_user_remaining_days(user, leave_type):
-    total_allocated = getattr(user.profile, f"{leave_type.lower().replace(' ', '_')}_total", 0)
-     
-    used_days = LeaveRequest.objects.filter(
-        applicant=user, 
-        leave_type=leave_type, 
-        status='Approved'
-    ).aggregate(total=Sum('days'))['total'] or 0
+    mapping = {
+        'Sick Leave': 'sick',
+        'Casual Leave': 'casual',
+        'Emergency Leave': 'emergency',
+        'Exam Leave': 'exam',
+        'Other': 'other'
+    }
     
-    return total_allocated - used_days
+    prefix = mapping.get(leave_type)
+    if not prefix:
+        return 0
+
+    balance = LeaveBalance.objects.filter(staff_id=user, year=2026).first()
+    if not balance:
+        return 0
+
+    total = getattr(balance, f"{prefix}_total", 0)
+    used = getattr(balance, f"{prefix}_used", 0)
+    
+    return total - used
 
 def deduct_leave_balance(leave):
     balance = LeaveBalance.objects.filter(staff_id=leave.applicant).first()
