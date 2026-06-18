@@ -18,6 +18,7 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
@@ -162,9 +163,15 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # settings.py
 
 # Initialize environment variables
+# Clean version of your .env loading
 env = environ.Env()
-# This line is critical: it tells Django where to find your .env file
-environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+dotenv_path = os.path.join(BASE_DIR, '.env')
+
+if os.path.exists(dotenv_path):
+    environ.Env.read_env(dotenv_path)
+else:
+    print(f"DEBUG: .env file NOT FOUND at {dotenv_path}")
+
 
 # Email Backend Configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -183,10 +190,10 @@ SESSION_SAVE_EVERY_REQUEST = False
 DEFAULT_FROM_EMAIL = "CRM Leave Portal <dharanigopal45@gmail.com>"
 
 # Session settings
-SESSION_ENGINE = 'django.contrib.sessions.backends.db'
-SESSION_COOKIE_AGE = 1209600  # 2 weeks
-SESSION_SAVE_EVERY_REQUEST = True # Force session save on every hit to test if it fixes the logout
-SESSION_COOKIE_HTTPONLY = True
+# SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+# SESSION_COOKIE_AGE = 1209600  # 2 weeks
+# SESSION_SAVE_EVERY_REQUEST = True # Force session save on every hit to test if it fixes the logout
+# SESSION_COOKIE_HTTPONLY = True
 
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
