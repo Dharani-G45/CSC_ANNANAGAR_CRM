@@ -89,7 +89,6 @@ class LeaveBalance(models.Model):
     @property
     def dynamic_remaining_balance(self):
         return self.dynamic_total_allocated - self.dynamic_total_used
-    
 # class HolidayCalendar(models.Model):
 #     HOLIDAY_TYPES = [
 #         ('Government', 'Government Holiday'),
