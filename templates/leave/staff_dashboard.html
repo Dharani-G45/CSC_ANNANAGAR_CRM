@@ -174,7 +174,7 @@
     </div>
 
     <div id="rejectModal" class="modal-overlay">
-        <form id="rejectForm" class="modal-card" onsubmit="handleReject(event, null, refreshDashboardSection)">
+        <form id="rejectForm" method="POST" class="modal-card" onsubmit="handleReject(event, null, refreshDashboardSection)">
             {% csrf_token %}
             <h3 style="margin-top: 0;">Rejection Reason</h3>
             <input type="text" name="reviewer_comments" class="modal-input" placeholder="Enter reason..." required>

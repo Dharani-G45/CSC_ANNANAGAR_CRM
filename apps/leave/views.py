@@ -82,7 +82,7 @@ def get_user_remaining_days(user, leave_type):
         'Casual Leave': 'casual',
         'Emergency Leave': 'emergency',
         'Exam Leave': 'exam',
-        'Other': 'other'
+        'Other Leave': 'other'
     }
     
     prefix = mapping.get(leave_type)
@@ -391,15 +391,14 @@ def approve_leave(request, leave_id):
 @login_required
 def reject_leave(request, leave_id):
     if request.method != 'POST':
-        return redirect('dashboard') 
+        return JsonResponse({'status': 'error', 'message': 'Invalid method'}, status=405)
         
     leave = get_object_or_404(LeaveRequest, leave_id=leave_id)
     comment = request.POST.get('reviewer_comments')
     
     if not comment:
-        messages.error(request, "Rejection reason required.")
-        return redirect('dashboard')
-    
+        return JsonResponse({'status': 'error', 'message': 'Rejection reason required.'}, status=400)
+
     leave.status = 'Rejected'
     leave.current_stage = 'Completed' 
     leave.save()

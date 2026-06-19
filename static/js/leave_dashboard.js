@@ -204,6 +204,23 @@ window.closeRejectModal = function() {
     document.getElementById('rejectModal').style.display = 'none';
 };
 
+
+window.handleReject = async function(event) {
+    // 1. Stop the browser's default GET-based form submission immediately
+    event.preventDefault(); 
+    event.stopPropagation();
+
+    const form = event.target;
+    const formData = new FormData(form);
+    const url = form.action;
+
+    // 2. Use your existing helper to send the data as a clean POST
+    await handleLeaveAction(event, url, formData, () => {
+        closeRejectModal();
+        refreshDashboardSection();
+    });
+};
+
 // --- CSRF Helper ---
 function getCookie(name) {
     let cookieValue = null;
@@ -236,7 +253,9 @@ async function handleLeaveAction(event, url, formData = null, onSuccessCallback 
     // Prepare fetch options
     const fetchOptions = {
         method: 'POST',
-        headers: { 'X-CSRFToken': getCookie('csrftoken') }
+        headers: { 
+            'X-CSRFToken': getCookie('csrftoken')
+        }
     };
 
     // Only add body if formData exists
@@ -258,6 +277,7 @@ async function handleLeaveAction(event, url, formData = null, onSuccessCallback 
         showGlobalPopup("Network error. Please try again.");
     }
 }
+
 async function refreshDashboardSection() {
     try {
         const response = await fetch(window.location.href);
@@ -265,24 +285,51 @@ async function refreshDashboardSection() {
         const parser = new DOMParser();
         const newDoc = parser.parseFromString(htmlText, 'text/html');
 
-        // IDs of the containers that need to be refreshed
-        const panelsToRefresh = [
-            'panel-leave-balance', 
-            'panel-pending-reviews', 
-            'panel-leave-history', 
-            'panel-approval-logs'
-        ];
-
+        // 1. Refresh existing panels
+        const panelsToRefresh = ['panel-leave-balance', 'panel-pending-reviews', 'panel-leave-history', 'panel-approval-logs'];
         panelsToRefresh.forEach(id => {
             const oldPanel = document.getElementById(id);
             const newPanel = newDoc.getElementById(id);
-            if (oldPanel && newPanel) {
-                oldPanel.innerHTML = newPanel.innerHTML;
-            }
+            if (oldPanel && newPanel) oldPanel.innerHTML = newPanel.innerHTML;
         });
-        
-        console.log("Dashboard refreshed successfully.");
+
+        // 2. CRITICAL: Refresh the Leave Type dropdown to update 'data-remaining' attributes
+        const newSelect = newDoc.getElementById('leave_type');
+        const oldSelect = document.getElementById('leave_type');
+        if (oldSelect && newSelect) {
+            oldSelect.innerHTML = newSelect.innerHTML;
+        }
+
+        console.log("Dashboard and Balances refreshed successfully.");
     } catch (error) {
         console.error("Error refreshing dashboard:", error);
     }
 }
+// async function refreshDashboardSection() {
+//     try {
+//         const response = await fetch(window.location.href);
+//         const htmlText = await response.text();
+//         const parser = new DOMParser();
+//         const newDoc = parser.parseFromString(htmlText, 'text/html');
+
+//         // IDs of the containers that need to be refreshed
+//         const panelsToRefresh = [
+//             'panel-leave-balance', 
+//             'panel-pending-reviews', 
+//             'panel-leave-history', 
+//             'panel-approval-logs'
+//         ];
+
+//         panelsToRefresh.forEach(id => {
+//             const oldPanel = document.getElementById(id);
+//             const newPanel = newDoc.getElementById(id);
+//             if (oldPanel && newPanel) {
+//                 oldPanel.innerHTML = newPanel.innerHTML;
+//             }
+//         });
+        
+//         console.log("Dashboard refreshed successfully.");
+//     } catch (error) {
+//         console.error("Error refreshing dashboard:", error);
+//     }
+// }

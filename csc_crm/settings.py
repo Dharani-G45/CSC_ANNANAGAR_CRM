@@ -26,7 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-a9e#4j@z2xzg1!ik=s-@xv((on564h#j5hrkaio3)8arb510ml'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 # ALLOWED_HOSTS = [
 #     'web-production-72b49.up.railway.app', 
@@ -52,7 +52,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'apps.leave.apps.AppConfig',
+    'apps.leave.apps.LeaveConfig',
 #  'apps.leave',   
     'profiles',
 ]
@@ -194,5 +194,5 @@ DEFAULT_FROM_EMAIL = "CRM Leave Portal <dharanigopal45@gmail.com>"
 # SESSION_SAVE_EVERY_REQUEST = True # Force session save on every hit to test if it fixes the logout
 # SESSION_COOKIE_HTTPONLY = True
 
-CSRF_COOKIE_SECURE = True
-SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = not DEBUG
+SESSION_COOKIE_SECURE = not DEBUG
