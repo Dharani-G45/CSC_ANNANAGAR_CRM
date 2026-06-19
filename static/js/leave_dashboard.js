@@ -286,23 +286,42 @@ async function refreshDashboardSection() {
         const newDoc = parser.parseFromString(htmlText, 'text/html');
 
         // 1. Refresh existing panels
-        const panelsToRefresh = ['panel-leave-balance', 'panel-pending-reviews', 'panel-leave-history', 'panel-approval-logs'];
+        const panelsToRefresh = [
+            'panel-leave-balance', 
+            'panel-pending-reviews', 
+            'panel-leave-history', 
+            'panel-approval-logs'
+        ];
+
         panelsToRefresh.forEach(id => {
             const oldPanel = document.getElementById(id);
             const newPanel = newDoc.getElementById(id);
-            if (oldPanel && newPanel) oldPanel.innerHTML = newPanel.innerHTML;
+            if (oldPanel && newPanel) {
+                oldPanel.innerHTML = newPanel.innerHTML;
+            }
         });
 
-        // 2. CRITICAL: Refresh the Leave Type dropdown to update 'data-remaining' attributes
+        // 2. Refresh the Balance Dropdown
         const newSelect = newDoc.getElementById('leave_type');
         const oldSelect = document.getElementById('leave_type');
         if (oldSelect && newSelect) {
             oldSelect.innerHTML = newSelect.innerHTML;
         }
 
-        console.log("Dashboard and Balances refreshed successfully.");
-    } catch (error) {
-        console.error("Error refreshing dashboard:", error);
+        // 3. NEW: Refresh the Navbar Button text
+        // We look for the button that contains "Student Reviews"
+        const navButtons = document.querySelectorAll('.tab-trigger-btn');
+        const newNavButtons = newDoc.querySelectorAll('.tab-trigger-btn');
+        
+        navButtons.forEach((btn, index) => {
+            if (btn.innerText.includes('Student Reviews')) {
+                // Update the text from the fresh document
+                btn.innerText = newNavButtons[index].innerText;
+            }
+        });
+
+    } catch(error){
+
     }
 }
 // async function refreshDashboardSection() {
